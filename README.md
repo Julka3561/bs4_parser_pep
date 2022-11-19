@@ -11,7 +11,7 @@ git clone https://github.com/Julka3561/bs4_parser_pep.git
 ```
 
 ```
-cd bs4_parser_pep/src
+cd bs4_parser_pep
 ```
 
 Создать и активировать виртуальное окружение:
@@ -34,6 +34,11 @@ python -m pip install --upgrade pip
 
 ```
 pip install -r requirements.txt
+```
+Перейти в папку с исходным кодом
+
+```
+cd src
 ```
 ## Работа с программой
 *Пример использования:*
