@@ -9,7 +9,7 @@ from tqdm import tqdm
 from configs import configure_argument_parser, configure_logging
 from constants import BASE_DIR, EXPECTED_STATUS, MAIN_DOC_URL, PEP_URL
 from outputs import control_output
-from utils import find_tag, get_response
+from utils import find_tag, get_response, logging_status_error
 
 
 def whats_new(session):
@@ -121,8 +121,7 @@ def pep(session):
     for pep_tag in tqdm(pep_tags):
         pep_abbr = find_tag(pep_tag, 'abbr')
         preview_status = pep_abbr.text[1:]
-        pep_ref_link = find_tag(pep_tag, 'a')
-        href = pep_ref_link['href']
+        href = find_tag(pep_tag, 'a')['href']
         pep_link = urljoin(PEP_URL, href)
         response = get_response(session, pep_link)
         if response is None:
@@ -131,9 +130,9 @@ def pep(session):
         description = find_tag(
             soup, 'dl', attrs={'class': 'rfc2822 field-list simple'})
         td = description.find(string='Status')
-        parent = td.find_parent()
-        status = parent.find_next_sibling().text
+        status = td.find_parent().find_next_sibling().text
         pep_list.append(status)
+
         try:
             if status not in EXPECTED_STATUS[preview_status]:
                 errors.append((pep_link, preview_status, status))
@@ -141,16 +140,8 @@ def pep(session):
             logging.error('Непредвиденный код статуса в превью: '
                           f'{preview_status}')
 
-    if errors:
-        err_desciption = ''
-        for row in errors:
-            err_desciption += row[0]
-            err_desciption += f'\nСтатус в карточке: {row[2]}'
-            err_desciption += (f'\nОжидаемые статусы: '
-                               f'{", ".join(EXPECTED_STATUS[row[1]])}')
+    logging_status_error(errors)
 
-        msg = 'Несовпадающие статусы:\n' + err_desciption
-        logging.warning(msg)
     statuses = []
     for status_list in EXPECTED_STATUS.values():
         for status in status_list:

@@ -2,6 +2,7 @@ import logging
 
 from requests import RequestException
 
+from constants import EXPECTED_STATUS
 from exceptions import ParserFindTagException
 
 
@@ -24,3 +25,16 @@ def find_tag(soup, tag, attrs=None):
         logging.error(error_msg, stack_info=True)
         raise ParserFindTagException(error_msg)
     return searched_tag
+
+
+def logging_status_error(errors):
+    if errors:
+        err_desciption = ''
+        for row in errors:
+            err_desciption += row[0]
+            err_desciption += f'\nСтатус в карточке: {row[2]}'
+            err_desciption += (f'\nОжидаемые статусы: '
+                               f'{", ".join(EXPECTED_STATUS[row[1]])}\n')
+
+        msg = 'Несовпадающие статусы:\n' + err_desciption
+        logging.warning(msg)
