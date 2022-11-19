@@ -31,7 +31,6 @@ def configure_argument_parser(available_modes):
 
 
 def configure_logging():
-    # Сформируйте путь до директории logs.
     log_dir = BASE_DIR / 'logs'
     log_dir.mkdir(exist_ok=True)
     log_file = log_dir / 'parser.log'
@@ -41,8 +40,6 @@ def configure_logging():
     logging.basicConfig(
         datefmt=DT_FORMAT,
         format=LOG_FORMAT,
-        # Уровень записи логов.
         level=logging.INFO,
-        # Вывод логов в терминал.
         handlers=(rotating_handler, logging.StreamHandler())
     )

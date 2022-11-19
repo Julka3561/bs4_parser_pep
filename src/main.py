@@ -134,8 +134,13 @@ def pep(session):
         parent = td.find_parent()
         status = parent.find_next_sibling().text
         pep_list.append(status)
-        if status not in EXPECTED_STATUS[preview_status]:
-            errors.append((pep_link, preview_status, status))
+        try:
+            if status not in EXPECTED_STATUS[preview_status]:
+                errors.append((pep_link, preview_status, status))
+        except KeyError:
+            logging.error('Непредвиденный код статуса в превью: '
+                          f'{preview_status}')
+
     if errors:
         err_desciption = ''
         for row in errors:
@@ -145,10 +150,12 @@ def pep(session):
                                f'{", ".join(EXPECTED_STATUS[row[1]])}')
 
         msg = 'Несовпадающие статусы:\n' + err_desciption
-        logging.info(msg)
+        logging.warning(msg)
+    statuses = []
     for status_list in EXPECTED_STATUS.values():
         for status in status_list:
-            if status not in dict(result).keys():
+            if status not in statuses:
+                statuses.append(status)
                 result.append((status, pep_list.count(status)))
     result.append(('Total', len(pep_list)))
     return result
