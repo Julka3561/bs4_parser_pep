@@ -157,8 +157,6 @@ MODE_TO_FUNCTION = {
     'latest-versions': latest_versions,
     'download': download,
     'pep': pep,
-
-
 }
 
 
